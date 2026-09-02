@@ -1,1 +1,1 @@
-# StudyNotion Edtech Project
+# GyanSetu Edtech Project

@@ -1,6 +1,6 @@
 {
-  "name": "studynotion-client",
-  "description": "This is the client side of the StudyNotion App",
+  "name": "gyansetu-client",
+  "description": "This is the client side of the GyanSetu App",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

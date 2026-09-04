@@ -25,12 +25,24 @@ database.connect();
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
+// app.use(
+// 	cors({
+// 		origin: "*",
+// 		credentials: true,
+// 	})
+// );
+
 app.use(
 	cors({
-		origin: "*",
+		origin: [
+			"http://localhost:3000",
+			"https://gyansetu-edu.vercel.app",
+		],
 		credentials: true,
 	})
 );
+
+
 app.use(
 	fileUpload({
 		useTempFiles: true,

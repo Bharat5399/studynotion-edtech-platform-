@@ -1,30 +1,48 @@
-const nodemailer = require("nodemailer")
 
+const https = require("https")
+ 
 const mailSender = async (email, title, body) => {
-  try {
-    let transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-      },
-      connectionTimeout: 10000,
-    })
-
-    let info = await transporter.sendMail({
-      from: `"GyanSetu | Bharat Rathod" <${process.env.MAIL_USER}>`, // sender address
-      to: `${email}`, // list of receivers
-      subject: `${title}`, // Subject line
-      html: `${body}`, // html body
-    })
-    console.log("Mail sent:", info.response)
-    return info
-  } catch (error) {
-    console.log("MAIL SENDER ERROR:", error)
-    throw error
+  const data = JSON.stringify({
+    from: "GyanSetu <onboarding@resend.dev>",
+    to: [email],
+    subject: title,
+    html: body,
+  })
+ 
+  const options = {
+    hostname: "api.resend.com",
+    path: "/emails",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Length": Buffer.byteLength(data),
+    },
   }
+ 
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let responseBody = ""
+      res.on("data", (chunk) => (responseBody += chunk))
+      res.on("end", () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          console.log("Mail sent:", responseBody)
+          resolve(JSON.parse(responseBody))
+        } else {
+          console.log("MAIL SENDER ERROR:", res.statusCode, responseBody)
+          reject(new Error(`Resend API error: ${res.statusCode} ${responseBody}`))
+        }
+      })
+    })
+ 
+    req.on("error", (error) => {
+      console.log("MAIL SENDER ERROR:", error)
+      reject(error)
+    })
+ 
+    req.write(data)
+    req.end()
+  })
 }
-
+ 
 module.exports = mailSender

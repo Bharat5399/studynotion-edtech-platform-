@@ -1,21 +1,20 @@
-
 const https = require("https")
  
 const mailSender = async (email, title, body) => {
   const data = JSON.stringify({
-    from: "GyanSetu <onboarding@resend.dev>",
-    to: [email],
+    sender: { name: "GyanSetu", email: process.env.BREVO_SENDER_EMAIL },
+    to: [{ email: email }],
     subject: title,
-    html: body,
+    htmlContent: body,
   })
  
   const options = {
-    hostname: "api.resend.com",
-    path: "/emails",
+    hostname: "api.brevo.com",
+    path: "/v3/smtp/email",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      "api-key": process.env.BREVO_API_KEY,
       "Content-Length": Buffer.byteLength(data),
     },
   }
@@ -30,7 +29,7 @@ const mailSender = async (email, title, body) => {
           resolve(JSON.parse(responseBody))
         } else {
           console.log("MAIL SENDER ERROR:", res.statusCode, responseBody)
-          reject(new Error(`Resend API error: ${res.statusCode} ${responseBody}`))
+          reject(new Error(`Brevo API error: ${res.statusCode} ${responseBody}`))
         }
       })
     })
@@ -46,3 +45,4 @@ const mailSender = async (email, title, body) => {
 }
  
 module.exports = mailSender
+ 

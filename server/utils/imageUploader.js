@@ -1,7 +1,7 @@
 const cloudinary = require("cloudinary").v2
 
 exports.uploadImageToCloudinary = async (file, folder, height, quality) => {
-  const options = { folder }
+  const options = { asset_folder: folder, folder }
   if (height) {
     options.height = height
   }
